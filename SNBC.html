@@ -668,9 +668,11 @@ function cineTransition(mutate){
   else { mutate() }
 }
 function go1(){
+  const s0 = document.getElementById('s0');
+  if(s0.classList.contains('hide')) return; // đã bấm rồi, chặn bấm đúp gây chồng chuyển cảnh
   initGyro();
   cineTransition(()=>{
-    document.getElementById('s0').classList.add('hide');
+    s0.classList.add('hide');
     document.getElementById('s1').classList.add('show');
   });
 }
@@ -896,6 +898,7 @@ function initEndFlowers(){
 }
 
 function go3(){
+  if(document.getElementById('s3').classList.contains('show')) return; // đã vào trang chính rồi, chặn bấm đúp
   hideLetterFlowers();
   cineTransition(()=>{
     document.getElementById('s2').classList.remove('show','cine-leaving');
