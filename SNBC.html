@@ -72,10 +72,18 @@
   /* ══════════ S0 INTRO ══════════ */
   #s0{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;transition:opacity .7s ease,visibility .7s,transform .7s ease;overflow:hidden}
   #s0.hide{opacity:0;visibility:hidden;pointer-events:none;transform:scale(1.045)}
-  .halo{position:absolute;border-radius:50%;opacity:.4;animation:pulseGlow 6s ease-in-out infinite}
-  .halo:nth-child(1){width:60vw;height:60vw;background:radial-gradient(circle,var(--pk) 0%,transparent 70%);top:-10%;left:-10%}
-  .halo:nth-child(2){width:50vw;height:50vw;background:radial-gradient(circle,var(--pu) 0%,transparent 70%);bottom:-10%;right:-10%;animation-delay:1.5s}
-  .halo:nth-child(3){width:40vw;height:40vw;background:radial-gradient(circle,var(--tl) 0%,transparent 70%);top:40%;left:60%;animation-delay:3s}
+  /* Đốm sáng ấm nhấp nháy như ánh nến, rải rác khắp màn intro — thay cho 3 vòng hào quang lạnh cũ */
+  .candle-field{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+  .candle-dot{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,214,140,.95) 0%,rgba(255,150,90,.55) 45%,transparent 75%);animation:candleFlicker ease-in-out infinite}
+  @keyframes candleFlicker{
+    0%{opacity:.35;transform:scale(.92)}
+    18%{opacity:.85;transform:scale(1.05)}
+    33%{opacity:.55;transform:scale(.97)}
+    47%{opacity:.9;transform:scale(1.08)}
+    64%{opacity:.4;transform:scale(.94)}
+    79%{opacity:.75;transform:scale(1.02)}
+    100%{opacity:.35;transform:scale(.92)}
+  }
   .s0-hearts{position:absolute;inset:0;overflow:hidden}
   .s0-heart{position:absolute;left:var(--left);bottom:0;font-size:var(--sz)}
   @keyframes s0Pop{from{opacity:0;transform:scale(.6) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -93,7 +101,11 @@
   .s0-tagline{min-height:1.6em;margin-top:1.4rem;font-size:clamp(.9rem,4vw,1.05rem);color:var(--pk);z-index:2;animation:s0Rise .6s ease .62s both}
   .s0-cursor{display:inline-block;width:2px;height:1em;background:var(--pk);vertical-align:-2px;animation:fadeIn .5s steps(1) infinite alternate}
   .s0-tap{margin-top:2.4rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;cursor:pointer;z-index:2;animation:s0Pop .6s cubic-bezier(.2,.9,.3,1.35) .95s both}
-  .s0-btn{width:52px;height:52px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-bd);box-shadow:0 8px 20px rgba(255,140,180,.25);display:flex;align-items:center;justify-content:center;font-size:1.4rem;animation:bob 2.4s ease-in-out infinite 1.6s}
+  .s0-btn{position:relative;width:52px;height:52px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-bd);box-shadow:0 8px 20px rgba(255,140,180,.25);display:flex;align-items:center;justify-content:center;font-size:1.4rem;animation:bob 2.4s ease-in-out infinite 1.6s}
+  /* Vòng sóng lan tỏa mời chạm — 2 vòng lệch nhịp cho cảm giác liên tục */
+  .s0-btn::before,.s0-btn::after{content:'';position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--pk);opacity:0;animation:tapRipple 2.6s ease-out infinite 1.8s}
+  .s0-btn::after{animation-delay:3.1s}
+  @keyframes tapRipple{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.9);opacity:0}}
   .s0-lbl{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint)}
 
   /* ══════════ S1 ENVELOPE ══════════ */
@@ -142,6 +154,15 @@
   .ending-sec{position:relative;overflow:hidden;padding:4.2rem 1.4rem 3.4rem;text-align:center;background:radial-gradient(ellipse at 50% 15%,#3a2260 0%,#1c1035 48%,#0c0818 100%);border-radius:28px 28px 0 0;margin-top:2.2rem}
   .ending-sky{position:absolute;inset:0;pointer-events:none}
   .ending-star{position:absolute;background:#fff;border-radius:50%;animation:twinkleStar ease-in-out infinite}
+  .ending-moon{position:absolute;top:8%;right:12%;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff7e0,#ffe9b8 60%,#f6d896 100%);box-shadow:0 0 30px 10px rgba(255,235,180,.35),0 0 60px 20px rgba(255,220,150,.15);opacity:0;transition:opacity 1.4s ease}
+  .ending-sec.on .ending-moon{opacity:1}
+  .ending-shoot{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;box-shadow:0 0 6px 1px #fff;opacity:0;animation:shootStar 2.6s ease-in infinite}
+  @keyframes shootStar{
+    0%{opacity:0;transform:translate(0,0) rotate(-35deg) scaleX(1)}
+    4%{opacity:1}
+    22%{opacity:0;transform:translate(-220px,150px) rotate(-35deg) scaleX(6)}
+    100%{opacity:0}
+  }
   @keyframes twinkleStar{0%,100%{opacity:.15}50%{opacity:1}}
   .ending-content{position:relative;z-index:1}
   .ending-line{font-family:'Cormorant Garamond',serif;font-size:1.12rem;color:#f3e8ff;line-height:1.85;margin-bottom:.85rem;opacity:0;transform:translateY(14px);transition:opacity .8s ease,transform .8s ease}
@@ -392,7 +413,7 @@
 
 <!-- S0 INTRO -->
 <div id="s0">
-  <div class="halo"></div><div class="halo"></div><div class="halo"></div>
+  <div class="candle-field" id="candleField"></div>
   <div class="s0-hearts" id="s0Hearts"></div>
   <div class="s0-ring" onclick="go1()"><div class="s0-icon">🎂</div></div>
   <h1 class="s0-h1">Dành cho Bé Thương</h1>
@@ -539,7 +560,11 @@
   <div class="side-cluster left" id="clusterEndL"></div>
   <div class="side-cluster right" id="clusterEndR"></div>
   <section class="ending-sec reveal">
-    <div class="ending-sky" id="endingSky"></div>
+    <div class="ending-sky" id="endingSky">
+      <div class="ending-moon"></div>
+      <div class="ending-shoot" style="top:15%;left:70%;animation-delay:.6s"></div>
+      <div class="ending-shoot" style="top:38%;left:20%;animation-delay:3.4s"></div>
+    </div>
     <div class="ending-content">
       <div class="ending-line">Cảm ơn vì đã đọc đến tận đây, Húi ơi 💕</div>
       <div class="ending-line">Đây chỉ là một phần rất nhỏ trong những gì anh dành cho em</div>
@@ -664,7 +689,12 @@ function typewriteLetter(){
    mượt hơn hẳn vì không phụ thuộc setTimeout của JS); tự động rơi về đổi class bình thường nếu
    trình duyệt chưa hỗ trợ hoặc người dùng bật "giảm chuyển động" */
 function cineTransition(mutate){
-  if(document.startViewTransition && !REDUCE_MOTION){ document.startViewTransition(mutate) }
+  if(document.startViewTransition && !REDUCE_MOTION){
+    _running = false; // tạm dừng vẽ nền lúc View Transition chụp ảnh cả trang — đỡ giật/đơ đúng lúc chuyển cảnh
+    const t = document.startViewTransition(mutate);
+    const resume = () => { _running = true };
+    if(t && t.finished) t.finished.then(resume, resume); else resume();
+  }
   else { mutate() }
 }
 function go1(){
@@ -993,6 +1023,39 @@ function initReveal(){
     setTimeout(tick, deleting?42:68);
   }
   setTimeout(tick, 1000);
+})();
+
+/* ══ S0: đốm sáng ấm nhấp nháy kiểu ánh nến rải khắp màn ══ */
+(() => {
+  const field = document.getElementById('candleField');
+  if(!field) return;
+  const frag = document.createDocumentFragment();
+  const n = IS_MOBILE ? 16 : 26; // đốm nhỏ, lấp lánh, rải khắp
+  for(let i=0;i<n;i++){
+    const d = document.createElement('div');
+    d.className = 'candle-dot';
+    const sz = 5 + Math.random()*22;
+    d.style.width = sz+'px'; d.style.height = sz+'px';
+    d.style.left = (Math.random()*100)+'%';
+    d.style.top = (Math.random()*100)+'%';
+    d.style.animationDuration = (2.2+Math.random()*2.6)+'s';
+    d.style.animationDelay = (Math.random()*3)+'s';
+    frag.appendChild(d);
+  }
+  const nBig = IS_MOBILE ? 3 : 5; // vài quầng lớn, mờ hơn, tạo chiều sâu như ánh nến hắt xa
+  for(let i=0;i<nBig;i++){
+    const d = document.createElement('div');
+    d.className = 'candle-dot';
+    const sz = 60 + Math.random()*90;
+    d.style.width = sz+'px'; d.style.height = sz+'px';
+    d.style.left = (Math.random()*100)+'%';
+    d.style.top = (Math.random()*100)+'%';
+    d.style.opacity = '.5';
+    d.style.animationDuration = (3.5+Math.random()*2)+'s';
+    d.style.animationDelay = (Math.random()*3)+'s';
+    frag.appendChild(d);
+  }
+  field.appendChild(frag);
 })();
 
 /* ══ S0: trái tim bay lên (giảm số lượng trên mobile) ══ */
