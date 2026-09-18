@@ -128,7 +128,7 @@
   /* ══════════ S2 LETTER ══════════ */
   #s2{position:fixed;inset:0;z-index:45;display:none;align-items:center;justify-content:center;padding:24px 16px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
   #s2.show{display:flex;animation:cineIn .55s cubic-bezier(.2,.8,.3,1)}
-  .lp{position:relative;width:min(440px,92vw);background:linear-gradient(170deg,#fff8f2,#fdeef4);border-radius:14px;padding:2.2rem 1.6rem 1.8rem;color:#3a1428;box-shadow:0 2px 4px rgba(0,0,0,.08),0 12px 24px rgba(255,61,130,.18),0 30px 70px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.7);margin:auto;animation:rise .6s ease}
+  .lp{position:relative;width:min(440px,80vw);background:linear-gradient(170deg,#fff8f2,#fdeef4);border-radius:14px;padding:2.2rem 1.6rem 1.8rem;color:#3a1428;box-shadow:0 2px 4px rgba(0,0,0,.08),0 12px 24px rgba(255,61,130,.18),0 30px 70px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.7);margin:auto;animation:rise .6s ease}
   .ld{display:flex;justify-content:center;gap:.8rem;color:var(--pk);font-size:1rem;margin-bottom:.8rem;opacity:.8}
   .l-date{text-align:center;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:#a84a6a;margin-bottom:1.2rem}
   .l-hi{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:#c22a63;margin-bottom:1rem}
@@ -808,15 +808,19 @@ function buildFlowerCluster(id, side){
   p.setAttribute('d', `M${side==='left'?-10:110},40 C${cx1},160 ${cx2},300 50,420 C${cx3},540 ${cx1},640 ${side==='left'?-10:110},760`);
   vine.appendChild(p); box.appendChild(vine);
 
-  const N = IS_MOBILE ? 6 : 10;      // số hoa chính
-  const BUDS = IS_MOBILE ? 3 : 5;     // số nụ hoa nhỏ điểm xuyết
+  const N = IS_MOBILE ? 9 : 14;      // số hoa chính — tăng lên cho rợp vì bé thích hoa
+  const BUDS = IS_MOBILE ? 6 : 10;    // số nụ hoa nhỏ điểm xuyết
 
   for(let i=0;i<N;i++){
     const t = i/Math.max(1,N-1);
     const top = 5 + t*84 + (Math.random()*5-2.5);
     const isBack = i%3===1;                       // ~1/3 số hoa lùi ra sau, mờ nhỏ hơn — tạo chiều sâu, đỡ rối
-    const size = (isBack ? 30+Math.random()*16 : 46+Math.random()*30);
-    const inward = (isBack ? 30+Math.random()*40 : 2+Math.random()*34);
+    /* Chỉ cho hoa "vươn to, vào sâu" ở sát đầu/cuối thư (chỗ trống, không có chữ) — càng vào giữa
+       (chỗ có đoạn văn) thì càng ép nhỏ và nép sát mép, đảm bảo không bao giờ đè lên chữ */
+    const edgeFactor = Math.max(0, 1 - Math.min(t, 1-t)/0.16);
+    const maxReach = (isBack ? 16 : 20) + edgeFactor*70;
+    const size = isBack ? 16+edgeFactor*22+Math.random()*8 : 18+edgeFactor*54+Math.random()*14;
+    const inward = Math.max(2, maxReach - size);
     const rot = Math.random()*50-25;
     const delay = (t*1.15 + Math.random()*0.12).toFixed(2);
     const useBlossom = i%3===2;
@@ -859,11 +863,14 @@ function buildFlowerCluster(id, side){
     }
   }
 
-  /* Nụ hoa nhỏ điểm xuyết cho đầy đặn mà không nặng mắt */
+  /* Nụ hoa nhỏ điểm xuyết cho đầy đặn mà không nặng mắt — cũng chỉ vươn xa ở đầu/cuối thư, đoạn có chữ thì nép sát mép */
   for(let j=0;j<BUDS;j++){
-    const top = 4 + Math.random()*88;
-    const size = 20+Math.random()*14;
-    const inward = 40+Math.random()*50;
+    const t = Math.random();
+    const top = 4 + t*88;
+    const edgeFactor = Math.max(0, 1 - Math.min(t, 1-t)/0.16);
+    const size = 12+edgeFactor*14+Math.random()*6;
+    const maxReach = 14 + edgeFactor*54;
+    const inward = Math.max(2, maxReach - size);
     const rot = Math.random()*40-20;
     const delay = (Math.random()*1.4+0.3).toFixed(2);
     const svg = document.createElementNS(NS,'svg');
