@@ -95,7 +95,17 @@
   .s0-ring::before{content:'';position:absolute;inset:-5px;border-radius:50%;background:conic-gradient(from var(--auraAngle),var(--pk),var(--gd),var(--pu),var(--pk));z-index:-1;filter:blur(3px);animation:spinAura 5s linear infinite}
   .s0-ring{position:relative;width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--pk),var(--pu));cursor:pointer;margin-bottom:22px;z-index:2;animation:s0Pop .7s cubic-bezier(.2,.9,.3,1.35) both,ringPulse 2.2s ease-in-out infinite .7s}
   .s0-icon{font-size:2.4rem}
-  .s0-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,7vw,2.8rem);font-weight:600;background:linear-gradient(90deg,var(--ink),var(--pk),var(--ink));background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;z-index:2;animation:s0Rise .65s ease .22s both,shimmer 4s linear infinite .9s}
+  /* ══ MÀN NHUNG MỞ ĐẦU — phủ kín màn hình lúc vừa tải trang, kéo mở sang 2 bên lộ ra nội dung ══ */
+  .curtain{position:fixed;top:0;bottom:0;width:50%;z-index:200;background:linear-gradient(135deg,var(--pu),var(--pk) 55%,var(--gd));transition:transform 1.05s cubic-bezier(.76,0,.18,1);box-shadow:0 0 60px rgba(0,0,0,.25)}
+  .curtain-l{left:0;transform:translateX(0)}
+  .curtain-r{right:0;transform:translateX(0)}
+  .curtain-l.open{transform:translateX(-101%)}
+  .curtain-r.open{transform:translateX(101%)}
+  #curtainMark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);font-size:4.4rem;z-index:201;opacity:1;transition:opacity .5s ease .25s,transform .6s cubic-bezier(.3,1.4,.4,1) .25s;pointer-events:none}
+  #curtainMark.open{opacity:0;transform:translate(-50%,-50%) scale(1.6)}
+  @keyframes titleWipe{from{clip-path:inset(0 101% 0 0)}to{clip-path:inset(0 0% 0 0)}}
+  .s0-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,7vw,2.8rem);font-weight:600;background:linear-gradient(90deg,var(--ink),var(--pk),var(--ink));background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;z-index:2;animation:s0Rise .65s ease .22s both,shimmer 4s linear infinite .9s,titleWipe 1s cubic-bezier(.7,0,.3,1) .3s both}
+
   .s0-sub{margin-top:.5rem;color:var(--ink-soft);letter-spacing:2px;font-size:clamp(.72rem,3vw,.85rem);z-index:2;animation:s0Rise .6s ease .42s both}
   .s0-tagline{min-height:1.6em;margin-top:1.4rem;font-size:clamp(.9rem,4vw,1.05rem);color:var(--pk);z-index:2;animation:s0Rise .6s ease .62s both}
   .s0-cursor{display:inline-block;width:2px;height:1em;background:var(--pk);vertical-align:-2px;animation:fadeIn .5s steps(1) infinite alternate}
@@ -169,7 +179,10 @@
   .ending-sec.on .ending-line:nth-child(1){transition-delay:.15s}
   .ending-sec.on .ending-line:nth-child(2){transition-delay:.55s}
   .ending-sec.on .ending-line:nth-child(3){transition-delay:.95s}
-  .ending-heart{margin-top:.6rem;font-size:1.6rem;opacity:0;transform:scale(.6);transition:opacity .8s ease,transform .8s ease}
+  .ending-heart{position:relative;margin-top:.6rem;font-size:1.6rem;opacity:0;transform:scale(.6);transition:opacity .8s ease,transform .8s ease}
+  .ending-heart::before,.ending-heart::after{content:'';position:absolute;inset:-14px;border-radius:50%;border:1.5px solid rgba(255,224,150,.65);opacity:0}
+  .ending-sec.on .ending-heart::before{animation:tapRipple 2.4s ease-out 1.7s}
+  .ending-sec.on .ending-heart::after{animation:tapRipple 2.4s ease-out 2.15s}
   .ending-sec.on .ending-heart{opacity:1;transform:scale(1);transition-delay:1.3s}
   .l-sign{margin-top:1.4rem;font-family:'Great Vibes',cursive;font-size:1.6rem;color:#c22a63;line-height:1.3}
   .l-sign-sub{display:block;font-family:'Nunito',sans-serif;font-size:.7rem;letter-spacing:1px;color:#a84a6a;margin-top:.3rem}
@@ -406,6 +419,11 @@
 <canvas id="cv-bg" class="bg-layer"></canvas>
 <canvas id="cv-pt" class="bg-layer"></canvas>
 <canvas id="cv-cf" class="bg-layer"></canvas>
+
+<!-- MÀN NHUNG MỞ ĐẦU -->
+<div id="curtainL" class="curtain curtain-l"></div>
+<div id="curtainR" class="curtain curtain-r"></div>
+<div id="curtainMark">🎂</div>
 
 <!-- S0 INTRO -->
 <div id="s0">
@@ -889,6 +907,23 @@ function buildFlowerCluster(id, side){
     svg.appendChild(use); box.appendChild(svg);
   }
 }
+/* ══ ĐÓNG MÀN: pháo hoa lớn nổ 1 lần khi cuộn tới phần credit cuối ══ */
+function initEndingFinale(){
+  const target = document.querySelector('.ending-sec');
+  if(!target || REDUCE_MOTION) return;
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        io.unobserve(en.target); // chỉ bắn 1 lần duy nhất, không lặp lại mỗi khi cuộn qua lại
+        setTimeout(()=>{
+          fireworks();
+          burst(innerWidth*.5, innerHeight*.4, 260);
+        }, 1500); // chờ các dòng chữ + trăng sao hiện xong rồi mới bắn, đúng lúc là cao trào
+      }
+    });
+  }, { threshold:.4 });
+  io.observe(target);
+}
 function initLetterFlowers(){
   buildFlowerCluster('clusterLetterL','left');
   buildFlowerCluster('clusterLetterR','right');
@@ -933,6 +968,7 @@ function go3(){
     initCake();
     initReveal();
     initEndFlowers();
+    initEndingFinale();
     popInFabs();
     startAmbient(); // nhạc nền tự phát khi vào trang chính (đã có gesture từ nút bấm)
   }, 480);
@@ -1021,6 +1057,17 @@ function initReveal(){
     setTimeout(tick, deleting?42:68);
   }
   setTimeout(tick, 1000);
+})();
+
+/* ══ MÀN NHUNG MỞ ĐẦU ══ */
+(() => {
+  const l = document.getElementById('curtainL'), r = document.getElementById('curtainR'), mark = document.getElementById('curtainMark');
+  if(!l || !r) return;
+  if(REDUCE_MOTION){ l.style.display='none'; r.style.display='none'; mark.style.display='none'; return }
+  setTimeout(()=>{
+    l.classList.add('open'); r.classList.add('open'); mark.classList.add('open');
+    setTimeout(()=>{ l.style.display='none'; r.style.display='none'; mark.style.display='none'; }, 1100);
+  }, 450); // để người xem kịp thấy icon bánh kem hiện ra trước khi màn kéo mở
 })();
 
 /* ══ S0: đốm sáng ấm nhấp nháy kiểu ánh nến rải khắp màn ══ */
